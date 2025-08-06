@@ -9,8 +9,8 @@
     - [x] set custom configuration for test run with gradle by adding API key as a environment variable to run **test**
         - _keep this step to share with related entities to let them run and test_
           - Configure **IntelliJ Run Configuration** to load variables from `.env` or manually set them.
-    - [ ] add `StripeProperties` with `@ConfigurationProperties` for stripe to read API key from application properties
-    - [ ] apply `@EnableConfigurationProperties` with `StripeProperties` on `Application`
+    - [x] add `StripeProperties` with `@ConfigurationProperties` for stripe to read API key from application properties
+    - [x] apply `@EnableConfigurationProperties` with `StripeProperties` on `Application`
 2. Implement a client `StripeClient` to enable applications to communicate with external API, **Stripe Payment Create API**
     - [ ] has `@Component` annotation to be managed by framework
     - [ ] takes an input property `StripeProperties` to read API key
