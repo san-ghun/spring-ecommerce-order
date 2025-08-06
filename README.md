@@ -12,13 +12,13 @@
     - [x] add `StripeProperties` with `@ConfigurationProperties` for stripe to read API key from application properties
     - [x] apply `@EnableConfigurationProperties` with `StripeProperties` on `Application`
 2. Implement a client `StripeClient` to enable applications to communicate with external API, **Stripe Payment Create API**
-    - [ ] has `@Component` annotation to be managed by framework
-    - [ ] takes an input property `StripeProperties` to read API key
-    - [ ] has a property `RestClient` to perform HTTP request to communicate with the Stripe API
-    - [ ] has a method `createCheckoutSession()` to create a `PaymentIntent` 
+    - [x] has `@Component` annotation to be managed by framework
+    - [x] takes an input property `StripeProperties` to read API key
+    - [x] has a property `RestClient` to perform HTTP request to communicate with the Stripe API
+    - [x] has a method `createCheckoutSession()` to create a `PaymentIntent` 
       - which is an object that tracks the full lifecycle of a payment in Stripe
-      - [ ] the method takes `PaymentRequest` as input
-      - [ ] return a `PaymentResponse` to check `status` of the `PaymentIntent`
+      - [x] the method takes `PaymentRequest` as input
+      - [x] return a `PaymentResponse` to check `status` of the `PaymentIntent`
 
 ### Step 1
 
