@@ -44,7 +44,12 @@ class CartControllerTest(
     fun addToCart() {
         val savedProduct = productRepository.findAll().last()
         val savedMember = memberRepository.findAll().last()
-        val form = CartAddItemForm(savedProduct.id, 1)
+        val form =
+            CartAddItemForm(
+                productId = savedProduct.id,
+                optionId = savedProduct.options.first().id,
+                quantity = 1,
+            )
         val expected = CartController.MESSAGE_ADD_SUCCESS
         val response = controller.addToCart(form, savedMember)
         assertThat(response.statusCode).isEqualTo(HttpStatus.OK)
@@ -71,7 +76,13 @@ class CartControllerTest(
         RestAssured
             .given().log().all()
             .header("Authorization", "Bearer $accessToken")
-            .body(CartAddItemForm(product.id, quantity))
+            .body(
+                CartAddItemForm(
+                    productId = product.id,
+                    optionId = product.options.first().id,
+                    quantity = quantity,
+                ),
+            )
             .contentType(ContentType.JSON)
             .`when`().post("/api/cart")
             .then().log().all()
@@ -81,7 +92,7 @@ class CartControllerTest(
 
     @Test
     fun `addToCart() - return 401 Unauthorized when credential is invalid`() {
-        val productId = PRODUCT_ID
+        val product = productRepository.findAll().first()
         val quantity = 1
 
         val accessToken =
@@ -97,7 +108,13 @@ class CartControllerTest(
         RestAssured
             .given().log().all()
             .header("Authorization", "Bearer $contaminatedToken")
-            .body(CartAddItemForm(productId, quantity))
+            .body(
+                CartAddItemForm(
+                    productId = product.id,
+                    optionId = product.options.first().id,
+                    quantity = quantity,
+                ),
+            )
             .contentType(ContentType.JSON)
             .`when`().post("/api/cart")
             .then().log().all()
@@ -111,7 +128,7 @@ class CartControllerTest(
         val expected = "Product ID is missing"
         RestAssured
             .given().log().all()
-            .body(CartAddItemForm(productId, quantity))
+            .body(CartAddItemForm(productId, 1L, quantity))
             .contentType(ContentType.JSON)
             .`when`().post("/api/cart")
             .then().log().all()
@@ -122,12 +139,18 @@ class CartControllerTest(
 
     @Test
     fun `Form validation failure when 'quantity' is less than 1`() {
-        val productId = PRODUCT_ID
+        val product = productRepository.findAll().first()
         val quantity = 0
         val expected = "Product quantity is too small"
         RestAssured
             .given().log().all()
-            .body(CartAddItemForm(productId, quantity))
+            .body(
+                CartAddItemForm(
+                    productId = product.id,
+                    optionId = product.options.first().id,
+                    quantity = quantity,
+                ),
+            )
             .contentType(ContentType.JSON)
             .`when`().post("/api/cart")
             .then().log().all()
@@ -154,7 +177,7 @@ class CartControllerTest(
         val savedProduct = productRepository.findAll().first()
         val member = Member(email = "testview2@test.com", password = "test1234")
         val savedMember = memberRepository.save(member)
-        val form = CartAddItemForm(savedProduct.id, 1)
+        val form = CartAddItemForm(savedProduct.id, savedProduct.options.first().id, 1)
         controller.addToCart(form, savedMember)
         val expected = 1
         val pageNumber = 0
@@ -183,7 +206,11 @@ class CartControllerTest(
         val savedProduct = productRepository.findAll().first()
         val member = Member(email = "test@test.com", password = "test1234")
         val savedMember = memberRepository.save(member)
-        cartItemService.addCartItem(savedMember.id, savedProduct.id)
+        cartItemService.addCartItem(
+            savedMember.id,
+            savedProduct.id,
+            savedProduct.options.first().id,
+        )
 
         val quantity = 10
         val form = CartUpdateQuantityForm(quantity)
@@ -207,7 +234,11 @@ class CartControllerTest(
         val savedProduct = productRepository.findAll().first()
         val member = Member(email = "test@test.com", password = "test1234")
         val savedMember = memberRepository.save(member)
-        cartItemService.addCartItem(savedMember.id, savedProduct.id)
+        cartItemService.addCartItem(
+            savedMember.id,
+            savedProduct.id,
+            savedProduct.options.first().id,
+        )
 
         val expected = CartItemService.MESSAGE_REMOVE_SUCCESS
         val response = controller.removeFromCart(savedProduct.id, savedMember)

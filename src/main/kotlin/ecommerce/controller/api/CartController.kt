@@ -46,26 +46,26 @@ class CartController(
         @RequestBody @Valid cartForm: CartAddItemForm,
         @LoginMember member: Member,
     ): ResponseEntity<String> {
-        cartItemService.addCartItem(member.id, cartForm.productId, cartForm.quantity)
+        cartItemService.addCartItem(member.id, cartForm.productId, cartForm.optionId, cartForm.quantity)
         return ResponseEntity.ok(MESSAGE_ADD_SUCCESS)
     }
 
-    @PutMapping("/{productId}")
+    @PutMapping("/{cartItemId}")
     fun updateQuantity(
-        @PathVariable productId: Long,
+        @PathVariable cartItemId: Long,
         @RequestBody @Valid cartForm: CartUpdateQuantityForm,
         @LoginMember member: Member,
     ): ResponseEntity<String> {
-        val message = cartItemService.updateQuantity(member.id, productId, cartForm.quantity)
+        val message = cartItemService.updateQuantity(member.id, cartItemId, cartForm.quantity)
         return ResponseEntity.ok(message)
     }
 
-    @DeleteMapping("/{productId}")
+    @DeleteMapping("/{cartItemId}")
     fun removeFromCart(
-        @PathVariable productId: Long,
+        @PathVariable cartItemId: Long,
         @LoginMember member: Member,
     ): ResponseEntity<String> {
-        val message = cartItemService.removeCartItem(member.id, productId)
+        val message = cartItemService.removeCartItem(member.id, cartItemId)
         return ResponseEntity.ok(message)
     }
 

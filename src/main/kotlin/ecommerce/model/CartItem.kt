@@ -21,6 +21,9 @@ class CartItem(
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id", nullable = false)
     var product: Product,
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "option_id", nullable = false)
+    var option: Option,
     @Column(nullable = false)
     var quantity: Int = 1,
     @Column(nullable = false)
@@ -34,7 +37,12 @@ class CartItem(
 
     companion object {
         fun to(cartItem: CartItem): CartItemResponse {
-            return CartItemResponse(cartItem.product, cartItem.quantity, cartItem.createdAt)
+            return CartItemResponse(
+                productName = cartItem.product.name,
+                optionName = cartItem.option.name,
+                quantity = cartItem.quantity,
+                createdAt = cartItem.createdAt,
+            )
         }
     }
 }

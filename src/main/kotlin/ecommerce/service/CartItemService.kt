@@ -4,6 +4,7 @@ import ecommerce.exception.NotFoundException
 import ecommerce.model.CartItem
 import ecommerce.repository.CartItemRepository
 import ecommerce.repository.MemberRepository
+import ecommerce.repository.OptionRepository
 import ecommerce.repository.ProductRepository
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
@@ -17,6 +18,7 @@ class CartItemService(
     private val memberRepository: MemberRepository,
     private val cartItemRepository: CartItemRepository,
     private val productRepository: ProductRepository,
+    private val optionRepository: OptionRepository,
 ) {
     fun getCartItemsByMemberId(
         memberId: Long,
@@ -39,6 +41,7 @@ class CartItemService(
     fun addCartItem(
         memberId: Long,
         productId: Long,
+        optionId: Long,
         quantity: Int = 1,
     ): CartItem {
         val member =
@@ -47,27 +50,26 @@ class CartItemService(
         val product =
             productRepository.findByIdOrNull(productId)
                 ?: throw NotFoundException(MESSAGE_PRODUCT_NOT_FOUND)
-        val target = cartItemRepository.findByMemberAndProduct(member, product)
+        val option =
+            optionRepository.findByIdOrNull(optionId)
+                ?: throw NotFoundException(MESSAGE_PRODUCT_NOT_FOUND)
+        val target = cartItemRepository.findByMemberAndProductAndOption(member, product, option)
         if (target.isPresent) {
             target.get().changeQuantity(quantity)
             return target.get()
         }
-        val cartItem = CartItem(member = member, product = product, quantity = quantity)
+        val cartItem = CartItem(member = member, product = product, option = option, quantity = quantity)
         return cartItemRepository.save(cartItem)
     }
 
     fun updateQuantity(
         memberId: Long,
-        productId: Long,
+        cartItemId: Long,
         quantity: Int,
     ): String {
-        val member =
-            memberRepository.findByIdOrNull(memberId)
-                ?: throw NotFoundException(MESSAGE_PRODUCT_NOT_FOUND)
-        val product =
-            productRepository.findByIdOrNull(productId)
-                ?: throw NotFoundException(MESSAGE_PRODUCT_NOT_FOUND)
-        val cartItem = cartItemRepository.findByMemberAndProduct(member, product)
+        memberRepository.findByIdOrNull(memberId)
+            ?: throw NotFoundException(MESSAGE_PRODUCT_NOT_FOUND)
+        val cartItem = cartItemRepository.findById(cartItemId)
         when (cartItem.isPresent) {
             true -> {
                 cartItem.get().quantity = quantity
@@ -79,15 +81,11 @@ class CartItemService(
 
     fun removeCartItem(
         memberId: Long,
-        productId: Long,
+        cartItemId: Long,
     ): String {
-        val member =
-            memberRepository.findByIdOrNull(memberId)
-                ?: throw NotFoundException(MESSAGE_PRODUCT_NOT_FOUND)
-        val product =
-            productRepository.findByIdOrNull(productId)
-                ?: throw NotFoundException(MESSAGE_PRODUCT_NOT_FOUND)
-        val cartItem = cartItemRepository.findByMemberAndProduct(member, product)
+        memberRepository.findByIdOrNull(memberId)
+            ?: throw NotFoundException(MESSAGE_PRODUCT_NOT_FOUND)
+        val cartItem = cartItemRepository.findById(cartItemId)
         when (cartItem.isPresent) {
             true -> {
                 cartItemRepository.delete(cartItem.get())

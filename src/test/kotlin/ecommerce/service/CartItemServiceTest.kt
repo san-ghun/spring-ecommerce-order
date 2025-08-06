@@ -81,8 +81,8 @@ class CartItemServiceTest(
         val member = Member(email = "test@test.com", password = "test1234")
         val registeredMember = memberRepository.save(member)
         val savedProduct = productRepository.findAll().first()
-        val savedItem = cartItemService.addCartItem(registeredMember.id, savedProduct.id, 1)
-        val target = cartItemService.addCartItem(registeredMember.id, savedProduct.id)
+        val savedItem = cartItemService.addCartItem(registeredMember.id, savedProduct.id, savedProduct.options.first().id, 1)
+        val target = cartItemService.addCartItem(registeredMember.id, savedProduct.id, savedProduct.options.first().id)
 
         assertThat(savedItem.id).isEqualTo(target.id)
         assertThat(target.quantity).isEqualTo(2)
@@ -96,7 +96,7 @@ class CartItemServiceTest(
         val savedItem = cartItemService.addCartItem(registeredMember.id, savedProduct.id, 1)
 
         val quantity = 20
-        cartItemService.updateQuantity(member.id, savedProduct.id, quantity)
+        cartItemService.updateQuantity(member.id, savedItem.id, quantity)
         val cartItem = cartItemRepository.findByIdOrNull(savedItem.id)
         assertThat(cartItem).isNotNull()
         assertThat(cartItem?.quantity).isEqualTo(quantity)
@@ -109,7 +109,7 @@ class CartItemServiceTest(
         val savedProduct = productRepository.findAll().first()
         val savedItem = cartItemService.addCartItem(registeredMember.id, savedProduct.id, 1)
 
-        cartItemService.removeCartItem(member.id, savedProduct.id)
+        cartItemService.removeCartItem(member.id, savedItem.id)
         val cartItem = cartItemRepository.findByIdOrNull(savedItem.id)
         assertThat(cartItem).isNull()
     }
